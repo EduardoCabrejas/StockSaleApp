@@ -1,0 +1,154 @@
+﻿@model StockSale.App.Models.ViewModels.ActualOrderViewModel
+
+@{
+    ViewData["Title"] = "Orden de Compra";
+    var total = 0f;
+    if (Model.Products_Prices != null)
+    {
+        foreach (var product in Model.Products_Prices)
+        {
+            // Calcula el importe total sumando precio * cantidad
+            var sumtotal = product.PriceSell * product.Quantity;
+            total += sumtotal;
+        }
+    }
+}
+
+<h2>Lista de Productos</h2>
+
+<!-- Input para buscar productos -->
+<div class="two-grid mb-4">
+    <input type="text" id="searchProduct" placeholder="Buscar productos..." onkeyup="filterProducts()" class="form-control" />
+    <div>
+            <form>
+                <button class="go-button w-75" type="submit" asp-area="" asp-controller="OrderBuy" asp-action="AddOrder">
+                    <svg viewBox="0 0 24 24" class="arr-2" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M16.1716 10.9999L10.8076 5.63589L12.2218 4.22168L20 11.9999L12.2218 19.778L10.8076 18.3638L16.1716 12.9999H4V10.9999H16.1716Z"></path>
+                    </svg>
+                    <span class="text">Volver a la Orden</span>
+                    <span class="circle"></span>
+                    <svg viewBox="0 0 24 24" class="arr-1" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M16.1716 10.9999L10.8076 5.63589L12.2218 4.22168L20 11.9999L12.2218 19.778L10.8076 18.3638L16.1716 12.9999H4V10.9999H16.1716Z"></path>
+                    </svg>
+                </button>
+            </form>
+    </div>
+</div>
+
+<form asp-action="AddProductsToOrder" method="post">
+    <div class="table-responsive">
+        <table class="table table-bordered table-hover">
+        <thead class="table-head">
+            <tr>
+                <th>Nombre del Producto</th>
+                <th>Proveedor</th>
+                <th>Unidad Medida</th>
+                <th>Stock</th>
+                <th>Precio Lista</th>
+                <th>Precio Venta</th>
+                <th>Cantidad</th>
+                <th>Acciones</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var product in Model.Products)
+            {
+                <tr>
+                    <td class="productName">@product?.Name</td>
+                    @if(product.Provider != null)
+                    {
+                        <td>@product?.Provider.Name</td>
+                    }
+                    else
+                    {
+                        <td>???</td>
+                    }
+
+                    <td>@product?.UnitM.Name</td>
+                    <td>@product?.Stock</td>
+                    <td>@product?.List_Price.ToString("C")</td>
+                    <td>@product?.Sell_Price.ToString("C")</td>
+
+                    <!-- Formulario para cada producto individual -->
+                    <form asp-action="AddProductsToOrder" method="post">
+                        <td>
+                            <input type="number" class="form-control" name="Quantity" min="1" value="1" />
+
+                        </td>
+                    <td class="two-grid">
+                        @if(product.Stock == 0)
+                        {
+                                <button class="btn btn-primary disabled">Añadir</button>
+                        }
+                        else
+                        {
+                            <input type="hidden" name="SelectedProductId" value="@product?.Id" />
+                            <button type="submit" class="btn btn-primary">Añadir</button>
+                        }
+                        <form>
+                            <button class="go-button" type="submit"
+                            asp-area=""
+                            asp-controller="Product"
+                            asp-action="Edit"
+                            asp-route-id="@product.Id">
+                                <svg viewBox="0 0 24 24" class="arr-2" xmlns="http://www.w3.org/2000/svg">
+                                    <path d="M16.1716 10.9999L10.8076 5.63589L12.2218 4.22168L20 11.9999L12.2218 19.778L10.8076 18.3638L16.1716 12.9999H4V10.9999H16.1716Z"></path>
+                                </svg>
+                                <span class="text">Detalles</span>
+                                <span class="circle"></span>
+                                <svg viewBox="0 0 24 24" class="arr-1" xmlns="http://www.w3.org/2000/svg">
+                                <path d="M16.1716 10.9999L10.8076 5.63589L12.2218 4.22168L20 11.9999L12.2218 19.778L10.8076 18.3638L16.1716 12.9999H4V10.9999H16.1716Z"></path>
+                                </svg>
+                            </button>
+                        </form>
+                    </td>
+                    </form>
+                </tr>
+            }
+        </tbody>
+        </table>
+    </div>
+</form>
+
+<h1>Productos Añadidos</h1>
+@if(Model.Products_Prices.Count > 0 && Model.Products_Prices != null)
+        {
+<div class="table-responsive">
+<table class="table">
+    <thead class="table-head">
+        <tr>
+            <th>Nombre del Producto</th>
+            <th>Precio Unitario</th>
+            <th>Cantidad</th>
+            <th>Importe</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var productPrice in Model.Products_Prices)
+        {
+            <tr>
+                <td>@productPrice?.Product.Name</td>
+                <td>@productPrice?.PriceSell.ToString("C")</td>
+                <td>@productPrice?.Quantity</td>
+                <td>@(productPrice?.PriceSell * productPrice?.Quantity)</td>
+            </tr>
+        }
+    </tbody>
+</table>
+</div>
+<!-- Mostrar el importe total -->
+<div>
+    <h4 class="title">Importe Total: @total.ToString("C")</h4>
+</div>
+
+}
+else
+{
+    <p class="notFound">No hay productos añadidos.</p>
+}
+@if (!string.IsNullOrEmpty(ViewBag.ErrorMessage))
+{
+    <script>
+        alert('@ViewBag.ErrorMessage');
+    </script>
+}

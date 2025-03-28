@@ -1,0 +1,55 @@
+﻿@model StockSale.App.Models.ViewModels.AddProductViewModel
+
+        <h1 class="title mb-4">Añadir Producto</h1>
+
+<div class="container py-2">
+    <form method="post">
+        <div class="two-grid">
+            <div class="inputBox">
+            <input type="text" id="name" asp-for="Name" required />
+            <span>Nombre</span>
+        </div>
+            <div class="inputBox">
+            <input type="text" id="packaging" asp-for="Packaging" required />
+            <span>Packaging</span>
+        </div>
+            <div class="inputBox">
+            <input type="number" asp-for="Stock" required/>
+            <span>Stock</span>
+        </div>
+            <div class="inputBox">
+            <input type="number" asp-for="Stock_Limit" required/>
+            <span>Stock Límite</span>
+        </div>
+            <div class="inputBox">
+            <input type="number" asp-for="List_Price" required/>
+            <span>Precio de Lista</span>
+        </div>
+            <div class="inputBox">
+            <input type="number" asp-for="Sell_Price" required />
+            <span>Precio de Venta</span>
+        </div>
+
+        <!-- Dropdown para Proveedores -->
+        <div class="inputBox">
+            <select class="form-control" asp-for="ProviderId" asp-items="@(new SelectList(Model.Providers, "Id", "Name"))" >
+                    <option id ="defaultOption" value="">Seleccione un proveedor</option>
+            </select>
+            <span>Proveedor</span>
+        </div>
+
+        <!-- Dropdown para Unidades de Medida -->
+            <div class="inputBox">
+                <select class="form-control" asp-for="UnitMId" asp-items="@(new SelectList(Model.UnitsM, "Id", "Name"))">
+                    <option value="">Seleccione la unidad de medida</option>
+                </select>
+                <span>Unidad de Medida</span>
+            </div>
+        </div>
+        <div class="btn-center">
+            <button type="submit" class="conf-button w-50">
+                <span class="text">Guardar</span>
+            </button>
+        </div>
+    </form>
+</div>
